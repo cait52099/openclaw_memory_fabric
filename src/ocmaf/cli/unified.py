@@ -56,7 +56,7 @@ _auto_source_config()
 
 
 @click.group()
-@click.version_option(version="0.1.0")
+@click.version_option(version="0.1.1")
 def unified():
     """OCMF Unified Entry Point - Memory that works across AI hosts.
 
@@ -125,11 +125,10 @@ def install(host, method, dry_run):
         click.echo("\n=== DRY RUN COMPLETE ===")
         return
 
-    # Find OCMF path (where this source is located)
-    this_file = Path(__file__).resolve()
-    # unified.py is at src/ocmaf/cli/unified.py
-    # go up to src/ocmaf/ which contains hosts/
-    ocmf_src = this_file.parent.parent
+    # Find OCMF path dynamically using the ocmaf package location
+    # This correctly resolves to the installed package location (even in venvs)
+    import ocmaf as ocmaf_pkg
+    ocmf_src = Path(ocmaf_pkg.__file__).parent
     hosts_dir = ocmf_src / "hosts"
 
     # Run the appropriate setup script
