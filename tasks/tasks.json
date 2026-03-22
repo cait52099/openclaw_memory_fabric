@@ -1,0 +1,1008 @@
+{
+  "version": "3.1",
+  "project": "OCMF Phase 7D/7E: Real User Journey Test + Multi-Host Switching UX",
+  "run_id": "033-user-journey",
+  "goal": "验证用户按 quickstart 操作是否能顺滑完成第一次可用记忆，并识别 Claude/Codex 切换时的真实体验问题",
+  "boundary": "本轮只做用户旅程测试 / friction logging / evidence 更新，不做新能力扩展",
+  "note": "Phase 7C = 完成. Phase 7D = 进行中. Phase 7E = 规划中. Claude = A1+B, Codex = C, OpenClaw = BLOCKED.",
+  "tasks": [
+    {
+      "id": "T-6F-01",
+      "phase": "6F",
+      "section": "A",
+      "title": "构造 stable conflict scenario 数据",
+      "description": "构造同主题、不同 source_tool、内容不同的数据，确保 conflict 稳定触发",
+      "goal": "Stable conflict scenario",
+      "input": "Phase 6E recall API",
+      "output": "runs/027-stable-golden-examples/conflict_test_data.py",
+      "steps": [
+        "构造 2 条同 title 但不同 content 的 memory",
+        "分别设置不同 source_tool (claude-code, codex-cli)",
+        "写入同一 project/user scope",
+        "验证 recall 时 conflict_detected=True"
+      ],
+      "evidence": "runs/027-stable-golden-examples/conflict_test_data.py",
+      "ac": "AC-GOLD-001",
+      "risk": "conflict detection 可能不稳定",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-02",
+      "phase": "6F",
+      "section": "A",
+      "title": "生成 recall conflict golden output",
+      "description": "生成稳定的 recall conflict 输出样例",
+      "goal": "recall_conflict_golden.txt",
+      "input": "T-6F-01 conflict data",
+      "output": "runs/027-stable-golden-examples/recall_conflict_golden.txt",
+      "steps": [
+        "执行 recall('测试主题', context)",
+        "验证 conflict_detected=True",
+        "验证 candidates 包含 2 条",
+        "保存 CLI 输出格式到 golden file"
+      ],
+      "evidence": "runs/027-stable-golden-examples/recall_conflict_golden.txt",
+      "ac": "AC-GOLD-001",
+      "risk": "输出格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-03",
+      "phase": "6F",
+      "section": "B",
+      "title": "构造 stable cross-host explain scenario 数据",
+      "description": "构造被多个 host 写入的 memory，确保 also_written_by 稳定出现",
+      "goal": "Stable cross-host explain scenario",
+      "input": "Phase 6E explain API",
+      "output": "runs/027-stable-golden-examples/explain_test_data.py",
+      "steps": [
+        "先写入一条 memory (source=claude-code)",
+        "再写入同 title 的 memory (source=codex-cli)",
+        "验证 explain 时 also_written_by 包含 codex-cli"
+      ],
+      "evidence": "runs/027-stable-golden-examples/explain_test_data.py",
+      "ac": "AC-GOLD-002",
+      "risk": "also_written_by 查询可能失败",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-04",
+      "phase": "6F",
+      "section": "B",
+      "title": "生成 explain cross-host golden output",
+      "description": "生成稳定的 explain cross-host 输出样例",
+      "goal": "explain_crosshost_golden.txt",
+      "input": "T-6F-03 explain data",
+      "output": "runs/027-stable-golden-examples/explain_crosshost_golden.txt",
+      "steps": [
+        "执行 explain(memory_id, recall_query)",
+        "验证 source_host_friendly 存在",
+        "验证 match_reasons 非空",
+        "验证 also_written_by 非空",
+        "保存 CLI 输出格式到 golden file"
+      ],
+      "evidence": "runs/027-stable-golden-examples/explain_crosshost_golden.txt",
+      "ac": "AC-GOLD-002",
+      "risk": "输出格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-05",
+      "phase": "6F",
+      "section": "C",
+      "title": "生成 recall provenance golden output",
+      "description": "生成 recall provenance 展示的稳定样例",
+      "goal": "recall_provenance_golden.txt",
+      "input": "Phase 6E recall API",
+      "output": "runs/027-stable-golden-examples/recall_provenance_golden.txt",
+      "steps": [
+        "写入不同 source_tool 的 memories",
+        "执行 recall",
+        "验证 source_host_friendly 显示正确",
+        "验证 timestamp 格式正确",
+        "保存输出到 golden file"
+      ],
+      "evidence": "runs/027-stable-golden-examples/recall_provenance_golden.txt",
+      "ac": "AC-GOLD-003",
+      "risk": "timestamp 格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-06",
+      "phase": "6F",
+      "section": "C",
+      "title": "生成 injection text golden output",
+      "description": "生成 to_injection_text() 的稳定样例",
+      "goal": "injection_text_golden.txt",
+      "input": "Phase 6E recall API",
+      "output": "runs/027-stable-golden-examples/injection_text_golden.txt",
+      "steps": [
+        "执行 recall 后调用 to_injection_text()",
+        "验证包含 (From Claude at HH:MM) 格式",
+        "验证包含 ⚠️ CONFLICT 提示",
+        "保存输出到 golden file"
+      ],
+      "evidence": "runs/027-stable-golden-examples/injection_text_golden.txt",
+      "ac": "AC-GOLD-003",
+      "risk": "格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-07",
+      "phase": "6F",
+      "section": "D",
+      "title": "生成 stable golden examples 回归测试脚本",
+      "description": "生成可回归验证的 golden examples 测试脚本",
+      "goal": "test_golden_examples.py",
+      "input": "所有 golden files",
+      "output": "runs/027-stable-golden-examples/test_golden_examples.py",
+      "steps": [
+        "创建 test_golden_examples.py",
+        "读取 recall_conflict_golden.txt",
+        "读取 explain_crosshost_golden.txt",
+        "验证实际输出匹配 golden output",
+        "输出 PASS/FAIL"
+      ],
+      "evidence": "runs/027-stable-golden-examples/test_golden_examples.py",
+      "ac": "AC-GOLD-004",
+      "risk": "测试逻辑可能需要调整",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-6F-08",
+      "phase": "6F",
+      "section": "D",
+      "title": "更新 Phase 6F evidence.md 和 known_limits.md",
+      "description": "记录 stable golden examples 成果",
+      "goal": "Phase 6F evidence",
+      "input": "所有 Phase 6F 输出",
+      "output": "runs/027-stable-golden-examples/evidence.md",
+      "steps": [
+        "创建 runs/027-stable-golden-examples/ 目录",
+        "记录所有 golden files 生成结果",
+        "区分 implemented vs stable scenario coverage",
+        "更新 known_limits.md"
+      ],
+      "evidence": "runs/027-stable-golden-examples/evidence.md",
+      "ac": "AC-GOLD-004",
+      "risk": "文档可能不完整",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7A-01",
+      "phase": "7A",
+      "section": "A",
+      "title": "定义统一入口 CLI 接口",
+      "description": "定义 ocmaf 命令行接口设计，屏蔽 MCP 细节",
+      "goal": "统一 CLI 接口设计",
+      "input": "Phase 6 host-visible output",
+      "output": "src/ocmaf/cli/unified.py",
+      "steps": [
+        "定义 ocmaf install 命令",
+        "定义 ocmaf status 命令",
+        "定义 ocmaf config 命令",
+        "定义 ocmaf recall/explain 命令",
+        "确保命令与现有功能兼容"
+      ],
+      "evidence": "src/ocmaf/cli/unified.py",
+      "ac": "AC-UE-001",
+      "risk": "与现有 CLI 冲突",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7A-02",
+      "phase": "7A",
+      "section": "A",
+      "title": "实现 host auto-detection",
+      "description": "实现自动检测当前宿主环境的逻辑",
+      "goal": "Host auto-detection",
+      "input": "Claude/Codex environment variables",
+      "output": "src/ocmaf/cli/host_detection.py",
+      "steps": [
+        "检测 Claude 环境 (CLAUDE_* vars)",
+        "检测 Codex 环境 (CODEX_* vars)",
+        "检测 OpenClaw 环境 (OPENCLAW_* vars)",
+        "返回 host type 和 recommended method"
+      ],
+      "evidence": "src/ocmaf/cli/host_detection.py",
+      "ac": "AC-UE-002",
+      "risk": "环境变量不够可靠",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7A-03",
+      "phase": "7A",
+      "section": "B",
+      "title": "实现 Claude 最小启动脚本",
+      "description": "实现 Claude 宿主的最小启动方式",
+      "goal": "Claude 启动脚本",
+      "input": "Claude Method A1+B (from host_matrix)",
+      "output": "src/ocmaf/hosts/claude_setup.sh",
+      "steps": [
+        "生成 Claude MCP 配置文件",
+        "设置 system-prompt recall 注入",
+        "验证 Claude 启动时加载 OCMF",
+        "输出启动验证证据"
+      ],
+      "evidence": "src/ocmaf/hosts/claude_setup.sh",
+      "ac": "AC-UE-003",
+      "risk": "Claude 配置格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7A-04",
+      "phase": "7A",
+      "section": "B",
+      "title": "实现 Codex 最小启动脚本",
+      "description": "实现 Codex 宿主的最小启动方式",
+      "goal": "Codex 启动脚本",
+      "input": "Codex Method C (from host_matrix)",
+      "output": "src/ocmaf/hosts/codex_setup.sh",
+      "steps": [
+        "生成 Codex MCP 配置文件",
+        "设置 manual recall/remember 命令",
+        "验证 Codex 启动时加载 OCMF",
+        "输出启动验证证据"
+      ],
+      "evidence": "src/ocmaf/hosts/codex_setup.sh",
+      "ac": "AC-UE-004",
+      "risk": "Codex MCP 配置格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-01",
+      "phase": "7B",
+      "section": "C",
+      "title": "定义默认自动记忆行为",
+      "description": "定义自动 recall/remember 的触发时机和范围",
+      "goal": "Auto-memory behavior 设计",
+      "input": "Phase 6E host-visible output",
+      "output": "docs/auto_memory_behavior.md",
+      "steps": [
+        "定义 session start 自动 recall",
+        "定义 session end 自动 remember",
+        "定义 auto-memory 配置分级 (0-3)",
+        "定义降级策略"
+      ],
+      "evidence": "docs/auto_memory_behavior.md",
+      "ac": "AC-AM-001",
+      "risk": "行为设计可能不符合用户预期",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-02",
+      "phase": "7B",
+      "section": "C",
+      "title": "实现自动 recall 触发",
+      "description": "实现 session 开始时自动 recall 的最小逻辑",
+      "goal": "Auto-recall trigger",
+      "input": "T-7B-01 auto-memory behavior",
+      "output": "src/ocmaf/api/auto_recall.py",
+      "steps": [
+        "实现 session start 时 recall",
+        "实现 recall 结果格式化注入",
+        "处理 conflict/warning 显示",
+        "验证自动 recall 正确触发"
+      ],
+      "evidence": "src/ocmaf/api/auto_recall.py",
+      "ac": "AC-AM-002",
+      "risk": "可能干扰正常对话流程",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-03",
+      "phase": "7B",
+      "section": "C",
+      "title": "实现自动 remember 触发",
+      "description": "实现 session 结束时自动 remember 的最小逻辑",
+      "goal": "Auto-remember trigger",
+      "input": "T-7B-01 auto-memory behavior",
+      "output": "src/ocmaf/api/auto_remember.py",
+      "steps": [
+        "实现 session end 时 remember",
+        "实现关键事件提取",
+        "验证自动 remember 正确触发",
+        "验证不影响主流程"
+      ],
+      "evidence": "src/ocmaf/api/auto_remember.py",
+      "ac": "AC-AM-003",
+      "risk": "可能遗漏重要上下文",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-04",
+      "phase": "7B",
+      "section": "D",
+      "title": "集成 regression gate 策略",
+      "description": "确保 regression gate 与主线集成",
+      "goal": "Regression gate integration",
+      "input": "Phase 6G regression gate",
+      "output": "ops/integrated_gate.sh",
+      "steps": [
+        "将 regression gate 挂接到主线",
+        "定义 gate 失败时的降级策略",
+        "文档化主线与护栏的关系",
+        "验证 gate 在 CI/CD 中工作"
+      ],
+      "evidence": "ops/integrated_gate.sh",
+      "ac": "AC-AM-004",
+      "risk": "gate 可能过于严格",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-05",
+      "phase": "7B",
+      "section": "E",
+      "title": "编写用户入门文档",
+      "description": "编写最小用户入门文档，屏蔽底层细节",
+      "goal": "User quickstart",
+      "input": "T-7A-01~04, T-7B-01~04",
+      "output": "docs/quickstart.md",
+      "steps": [
+        "编写 ocmaf install 步骤",
+        "编写 Claude 快速开始",
+        "编写 Codex 快速开始",
+        "明确用户不需要理解的概念"
+      ],
+      "evidence": "docs/quickstart.md",
+      "ac": "AC-AM-005",
+      "risk": "文档可能过于技术化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-06",
+      "phase": "7B",
+      "section": "E",
+      "title": "验证统一入口最小包",
+      "description": "验证统一入口方案的最小可用性",
+      "goal": "Unified entry validation",
+      "input": "所有 7A/7B 实现",
+      "output": "runs/029-unified-entry/validation.md",
+      "steps": [
+        "安装 OCMF",
+        "检测当前 host",
+        "运行 auto recall",
+        "验证输出包含 provenance",
+        "验证 regression gate 通过"
+      ],
+      "evidence": "runs/029-unified-entry/validation.md",
+      "ac": "AC-AM-006",
+      "risk": "集成测试可能失败",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7B-07",
+      "phase": "7B",
+      "section": "E",
+      "title": "更新 evidence.md 和 known_limits.md",
+      "description": "记录 Phase 7A/7B 成果和边界",
+      "goal": "Phase 7A/7B evidence",
+      "input": "所有 7A/7B 输出",
+      "output": "runs/029-unified-entry/evidence.md",
+      "steps": [
+        "更新统一入口 evidence",
+        "更新自动记忆 evidence",
+        "明确 product mainline vs regression guardrail",
+        "明确 specified-only"
+      ],
+      "evidence": "runs/029-unified-entry/evidence.md",
+      "ac": "AC-AM-006",
+      "risk": "文档可能不完整",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-01",
+      "phase": "7C",
+      "section": "A",
+      "title": "验证 unified CLI 入口可用性",
+      "description": "ocmaf unified --help 不依赖 PYTHONPATH 可正常工作",
+      "goal": "Unified CLI 入口可用",
+      "input": "当前 unified.py 实现",
+      "output": "可直接调用的 CLI 入口",
+      "steps": [
+        "检查 python3 -m ocmaf.cli.unified --help 是否工作",
+        "检查 ocmaf unified 命令是否注册到 PATH",
+        "如需要，更新 setup.py 或 pyproject.toml 注册命令",
+        "给出最小可用安装/调用方式"
+      ],
+      "evidence": "src/ocmaf/cli/unified.py, setup.py",
+      "ac": "AC-7C-INSTALL-001",
+      "risk": "CLI 注册可能需要 pip install -e",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-02",
+      "phase": "7C",
+      "section": "B",
+      "title": "Claude install 真正配置 A1+B",
+      "description": "install 后 Claude 真正能 auto-recall",
+      "goal": "Claude A1+B 配置",
+      "input": "Claude Method A1+B 验证结论",
+      "output": "claude_setup.sh 正确配置 MCP + system-prompt",
+      "steps": [
+        "检查当前 claude_setup.sh 是否配置了 MCP server",
+        "检查是否配置了 system-prompt recall 注入 (B method)",
+        "检查是否配置了 native hooks (A1 method)",
+        "更新 claude_setup.sh 确保 A1+B 都配置"
+      ],
+      "evidence": "src/ocmaf/hosts/claude_setup.sh",
+      "ac": "AC-7C-INSTALL-001, AC-7C-INSTALL-002",
+      "risk": "Claude MCP config 格式可能变化",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-03",
+      "phase": "7C",
+      "section": "B",
+      "title": "Claude install E2E 验证",
+      "description": "Claude install 后可以真正 recall",
+      "goal": "Claude E2E install 证据",
+      "input": "T-7C-02 配置好的 claude_setup.sh",
+      "output": "Claude E2E install 证据",
+      "steps": [
+        "运行 claude_setup.sh",
+        "验证 MCP config 生成",
+        "验证 OCMF_AUTO_MEMORY 设置",
+        "运行 recall 测试"
+      ],
+      "evidence": "runs/030-unified-install-e2e/claude_install_e2e.md",
+      "ac": "AC-7C-INSTALL-002",
+      "risk": "真实环境可能与测试不同",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-04",
+      "phase": "7C",
+      "section": "C",
+      "title": "Codex install 真正配置 Method C",
+      "description": "install 后 Codex 真正能通过 MCP 调用 recall/remember",
+      "goal": "Codex MCP 配置",
+      "input": "Codex Method C 验证结论",
+      "output": "codex_setup.sh 正确配置 MCP server 入口",
+      "steps": [
+        "检查当前 codex_setup.sh MCP config 路径",
+        "验证 MCP server 入口指向正确的 Python 模块",
+        "确保使用已验证的 python3 -m ocmaf.cli.main",
+        "更新 codex_setup.sh 纠正错误的入口路径"
+      ],
+      "evidence": "src/ocmaf/hosts/codex_setup.sh",
+      "ac": "AC-7C-INSTALL-003",
+      "risk": "MCP server 入口路径错误",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-05",
+      "phase": "7C",
+      "section": "C",
+      "title": "Codex install E2E 验证",
+      "description": "Codex install 后可以真正 recall",
+      "goal": "Codex E2E install 证据",
+      "input": "T-7C-04 配置好的 codex_setup.sh",
+      "output": "Codex E2E install 证据",
+      "steps": [
+        "运行 codex_setup.sh",
+        "验证 MCP config 生成",
+        "验证 MCP server 连接",
+        "运行 recall 测试"
+      ],
+      "evidence": "runs/030-unified-install-e2e/codex_install_e2e.md",
+      "ac": "AC-7C-INSTALL-003",
+      "risk": "Codex 环境可能不可用",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-06",
+      "phase": "7C",
+      "section": "D",
+      "title": "修正 unified status host 判断逻辑",
+      "description": "status 不依赖 binary 存在性判断 host",
+      "goal": "Status 准确判断",
+      "input": "当前 host_detection.py 实现",
+      "output": "更新的 host_detection.py",
+      "steps": [
+        "区分 installed capability vs current runtime host",
+        "不只依赖 binary 存在性",
+        "优先检测 env vars",
+        "明确显示 host detected, method recommended, auto-memory supported"
+      ],
+      "evidence": "src/ocmaf/cli/host_detection.py",
+      "ac": "AC-7C-STATUS-001, AC-7C-STATUS-002, AC-7C-STATUS-003, AC-7C-STATUS-004, AC-7C-STATUS-005",
+      "risk": "误判可能导致用户困惑",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-07",
+      "phase": "7C",
+      "section": "E",
+      "title": "Quickstart 与真实路径对齐",
+      "description": "Quickstart 描述的每一步都真实可执行",
+      "goal": "Quickstart truthfulness",
+      "input": "当前 quickstart.md, T-7C-01~06 实现",
+      "output": "更新的 quickstart.md",
+      "steps": [
+        "检查 quickstart.md 每一步是否与实现对应",
+        "确保不暴露 MCP/method 细节",
+        "确保步骤可执行",
+        "移除假设用户已配置等不实描述"
+      ],
+      "evidence": "docs/quickstart.md",
+      "ac": "Quickstart Truthfulness Rules",
+      "risk": "描述可能过时",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-08",
+      "phase": "7C",
+      "section": "F",
+      "title": "E2E install -> recall 证据",
+      "description": "至少一条真实的 install -> status -> usable memory path 证据",
+      "goal": "E2E 证据",
+      "input": "T-7C-01~07 所有实现",
+      "output": "runs/030-unified-install-e2e/e2e_evidence.md",
+      "steps": [
+        "选择 Claude 或 Codex 作为测试目标",
+        "运行完整 install",
+        "运行 unified status",
+        "执行一次 recall",
+        "记录完整输出和退出码"
+      ],
+      "evidence": "runs/030-unified-install-e2e/e2e_evidence.md",
+      "ac": "AC-7C-INSTALL-004, AC-7C-INSTALL-005",
+      "risk": "环境限制可能导致无法完整测试",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7C-09",
+      "phase": "7C",
+      "section": "G",
+      "title": "更新 evidence.md 和 known_limits.md",
+      "description": "记录 Phase 7C 成果和边界",
+      "goal": "Phase 7C evidence",
+      "input": "所有 Phase 7C 输出",
+      "output": "runs/030-unified-install-e2e/evidence.md, known_limits.md",
+      "steps": [
+        "区分 product mainline vs regression guardrail",
+        "明确 Claude/Codex 已验证路径",
+        "明确本轮新增的可信闭环",
+        "明确 specified-only"
+      ],
+      "evidence": "runs/030-unified-install-e2e/evidence.md",
+      "ac": "N/A",
+      "risk": "文档可能不完整",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "completed"
+    },
+    {
+      "id": "T-7D-01",
+      "phase": "7D",
+      "section": "A",
+      "title": "Claude quickstart user journey test",
+      "description": "验证用户按 quickstart 原样操作 Claude 路径",
+      "goal": "Claude quickstart journey",
+      "input": "docs/quickstart.md, Phase 7C CLI",
+      "output": "runs/033-user-journey/claude_journey.md",
+      "steps": [
+        "清除现有 OCMF config",
+        "按 quickstart 执行: install -> source config -> remember -> recall",
+        "记录每个步骤的 stdout/stderr/exit code",
+        "测量总时间",
+        "识别卡点"
+      ],
+      "evidence": "runs/033-user-journey/claude_journey.md",
+      "ac": "AC-7D-FUM-001, AC-7D-FUM-002, AC-7D-FUM-003, AC-7D-FUM-004",
+      "risk": "无破坏性操作",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7D-02",
+      "phase": "7D",
+      "section": "B",
+      "title": "Codex quickstart user journey test",
+      "description": "验证用户按 quickstart 原样操作 Codex 路径",
+      "goal": "Codex quickstart journey",
+      "input": "docs/quickstart.md, Phase 7C CLI",
+      "output": "runs/033-user-journey/codex_journey.md",
+      "steps": [
+        "清除现有 OCMF config",
+        "按 quickstart 执行: install -> source config -> remember -> recall",
+        "记录每个步骤的 stdout/stderr/exit code",
+        "测量总时间",
+        "识别卡点"
+      ],
+      "evidence": "runs/033-user-journey/codex_journey.md",
+      "ac": "AC-7D-FUM-001, AC-7D-FUM-002, AC-7D-FUM-003, AC-7D-FUM-004",
+      "risk": "无破坏性操作",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7D-03",
+      "phase": "7D",
+      "section": "C",
+      "title": "Claude journey friction analysis",
+      "description": "识别 Claude 路径的实际卡点",
+      "goal": "Claude friction analysis",
+      "input": "T-7D-01 output",
+      "output": "runs/033-user-journey/friction_log.md",
+      "steps": [
+        "分析 T-7D-01 执行记录",
+        "识别 friction point",
+        "评估严重度",
+        "提出解决方案"
+      ],
+      "evidence": "runs/033-user-journey/friction_log.md",
+      "ac": "AC-7D-FRICTION-001",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "pending"
+    },
+    {
+      "id": "T-7D-04",
+      "phase": "7D",
+      "section": "C",
+      "title": "Codex journey friction analysis",
+      "description": "识别 Codex 路径的实际卡点",
+      "goal": "Codex friction analysis",
+      "input": "T-7D-02 output",
+      "output": "runs/033-user-journey/friction_log.md",
+      "steps": [
+        "分析 T-7D-02 执行记录",
+        "识别 friction point",
+        "评估严重度",
+        "提出解决方案"
+      ],
+      "evidence": "runs/033-user-journey/friction_log.md",
+      "ac": "AC-7D-FRICTION-002",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "pending"
+    },
+    {
+      "id": "T-7D-05",
+      "phase": "7D",
+      "section": "D",
+      "title": "Generate user_journey.md",
+      "description": "汇总 Claude/Codex 用户旅程测试结果",
+      "goal": "Phase 7D evidence",
+      "input": "T-7D-01~04 output",
+      "output": "runs/033-user-journey/user_journey.md",
+      "steps": [
+        "汇总两个旅程的执行结果",
+        "评估是否满足 AC-7D-FUM-*",
+        "给出 PASS/FAIL 判定",
+        "列出 friction points"
+      ],
+      "evidence": "runs/033-user-journey/user_journey.md",
+      "ac": "AC-7D-EVIDENCE-001",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-01",
+      "phase": "7E",
+      "section": "A",
+      "title": "Claude to Codex switching test",
+      "description": "验证 Claude 配置后切换到 Codex 的体验",
+      "goal": "Claude to Codex switch",
+      "input": "T-7D-01 Claude config",
+      "output": "runs/034-switching-ux/claude_to_codex.md",
+      "steps": [
+        "确保 Claude 已配置",
+        "执行 Codex install",
+        "检查 ~/.ocmf/config.sh 的 OCMF_SOURCE_TOOL",
+        "执行 remember 并观察 Source",
+        "执行 recall",
+        "记录切换体验问题"
+      ],
+      "evidence": "runs/034-switching-ux/claude_to_codex.md",
+      "ac": "AC-7E-SWITCH-001",
+      "risk": "只影响测试数据",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-02",
+      "phase": "7E",
+      "section": "A",
+      "title": "Codex to Claude switching test",
+      "description": "验证 Codex 配置后切换回 Claude 的体验",
+      "goal": "Codex to Claude switch",
+      "input": "T-7D-02 Codex config, T-7E-01",
+      "output": "runs/034-switching-ux/codex_to_claude.md",
+      "steps": [
+        "确保 Codex 已配置",
+        "执行 Claude install",
+        "检查 ~/.ocmf/config.sh 的 OCMF_SOURCE_TOOL",
+        "执行 remember 并观察 Source",
+        "执行 recall",
+        "记录切换体验问题"
+      ],
+      "evidence": "runs/034-switching-ux/codex_to_claude.md",
+      "ac": "AC-7E-SWITCH-002",
+      "risk": "只影响测试数据",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-03",
+      "phase": "7E",
+      "section": "A",
+      "title": "Cross-host memory sharing test",
+      "description": "验证跨宿主记忆共享",
+      "goal": "Cross-host sharing",
+      "input": "T-7E-01, T-7E-02 memory.db",
+      "output": "runs/034-switching-ux/cross_host_shared.md",
+      "steps": [
+        "确保两个宿主 memory.db 共享",
+        "Claude: remember --content 'Shared cross-host memory'",
+        "切换到 Codex 环境",
+        "Codex: recall --query 'cross-host'",
+        "验证能否召回 Claude 的记忆",
+        "记录来源显示"
+      ],
+      "evidence": "runs/034-switching-ux/cross_host_shared.md",
+      "ac": "AC-7E-SHARE-001",
+      "risk": "只影响测试数据",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-04",
+      "phase": "7E",
+      "section": "B",
+      "title": "Switching friction analysis",
+      "description": "识别多宿主切换的实际体验问题",
+      "goal": "Switching friction analysis",
+      "input": "T-7E-01, T-7E-02, T-7E-03 output",
+      "output": "runs/034-switching-ux/friction_log.md",
+      "steps": [
+        "分析切换测试记录",
+        "识别 friction point",
+        "评估严重度",
+        "提出改进建议"
+      ],
+      "evidence": "runs/034-switching-ux/friction_log.md",
+      "ac": "AC-7E-FRICTION-001",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": true,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-05",
+      "phase": "7E",
+      "section": "C",
+      "title": "Generate switching_ux.md",
+      "description": "汇总多宿主切换测试结果",
+      "goal": "Phase 7E evidence",
+      "input": "T-7E-01~04 output",
+      "output": "runs/034-switching-ux/switching_ux.md",
+      "steps": [
+        "汇总三个切换场景的执行结果",
+        "评估是否满足 AC-7E-*",
+        "给出 PASS/FAIL/NEEDS_WORK 判定",
+        "列出 friction points",
+        "提出 product polish priorities"
+      ],
+      "evidence": "runs/034-switching-ux/switching_ux.md",
+      "ac": "AC-7E-EVIDENCE-001",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    },
+    {
+      "id": "T-7E-06",
+      "phase": "7E",
+      "section": "C",
+      "title": "Generate final evidence and known_limits",
+      "description": "汇总 Phase 7D/7E 全部成果",
+      "goal": "Phase 7D/7E final evidence",
+      "input": "T-7D-05, T-7E-05 output",
+      "output": "runs/033-user-journey/evidence.md, known_limits.md",
+      "steps": [
+        "生成 runs/033-user-journey/evidence.md",
+        "生成 runs/033-user-journey/known_limits.md",
+        "更新 tasks/tasks.md 完成状态"
+      ],
+      "evidence": "runs/033-user-journey/evidence.md, known_limits.md",
+      "ac": "AC-7D-EVIDENCE-002, AC-7E-EVIDENCE-002",
+      "risk": "无",
+      "human_in_the_loop": false,
+      "parallel": false,
+      "status": "pending"
+    }
+  ],
+  "success_criteria": {
+    "unified_cli_entry": "ocmaf unified --help 不依赖 PYTHONPATH = 进行中",
+    "claude_wiring": "Claude install 配置 A1+B = 进行中",
+    "claude_e2e": "Claude install -> recall = 进行中",
+    "codex_wiring": "Codex install 配置 MCP = 进行中",
+    "codex_e2e": "Codex install -> recall = 进行中",
+    "status_fix": "不依赖 binary 判断 = 进行中",
+    "quickstart": "对应真实路径 = 进行中",
+    "e2e_evidence": "install -> recall 证据 = 进行中",
+    "claude_journey": "按 quickstart 能完成 install -> source -> remember -> recall = 进行中",
+    "codex_journey": "按 quickstart 能完成 install -> source -> remember -> recall = 进行中",
+    "friction_logged": "所有卡点已记录 = 进行中",
+    "switch_claude_to_codex": "Claude->Codex 切换 = 进行中",
+    "switch_codex_to_claude": "Codex->Claude 切换 = 进行中",
+    "cross_host_sharing": "Claude 写入能被 Codex 召回 = 进行中"
+  },
+  "ac_mapping": {
+    "AC-UE-001": [
+      "T-7A-01"
+    ],
+    "AC-UE-002": [
+      "T-7A-02"
+    ],
+    "AC-UE-003": [
+      "T-7A-03"
+    ],
+    "AC-UE-004": [
+      "T-7A-04"
+    ],
+    "AC-AM-001": [
+      "T-7B-01"
+    ],
+    "AC-AM-002": [
+      "T-7B-02"
+    ],
+    "AC-AM-003": [
+      "T-7B-03"
+    ],
+    "AC-AM-004": [
+      "T-7B-04"
+    ],
+    "AC-AM-005": [
+      "T-7B-05"
+    ],
+    "AC-AM-006": [
+      "T-7B-06",
+      "T-7B-07"
+    ],
+    "AC-7C-INSTALL-001": [
+      "T-7C-01"
+    ],
+    "AC-7C-INSTALL-002": [
+      "T-7C-02",
+      "T-7C-03"
+    ],
+    "AC-7C-INSTALL-003": [
+      "T-7C-04",
+      "T-7C-05"
+    ],
+    "AC-7C-INSTALL-004": [
+      "T-7C-08"
+    ],
+    "AC-7C-INSTALL-005": [
+      "T-7C-08"
+    ],
+    "AC-7C-STATUS-001": [
+      "T-7C-06"
+    ],
+    "AC-7C-STATUS-002": [
+      "T-7C-06"
+    ],
+    "AC-7C-STATUS-003": [
+      "T-7C-06"
+    ],
+    "AC-7C-STATUS-004": [
+      "T-7C-06"
+    ],
+    "AC-7C-STATUS-005": [
+      "T-7C-06"
+    ],
+    "AC-7D-FUM-001": [
+      "T-7D-01",
+      "T-7D-02"
+    ],
+    "AC-7D-FUM-002": [
+      "T-7D-01",
+      "T-7D-02"
+    ],
+    "AC-7D-FUM-003": [
+      "T-7D-01",
+      "T-7D-02"
+    ],
+    "AC-7D-FUM-004": [
+      "T-7D-01",
+      "T-7D-02"
+    ],
+    "AC-7D-FRICTION-001": [
+      "T-7D-03"
+    ],
+    "AC-7D-FRICTION-002": [
+      "T-7D-04"
+    ],
+    "AC-7D-EVIDENCE-001": [
+      "T-7D-05"
+    ],
+    "AC-7E-SWITCH-001": [
+      "T-7E-01"
+    ],
+    "AC-7E-SWITCH-002": [
+      "T-7E-02"
+    ],
+    "AC-7E-SHARE-001": [
+      "T-7E-03"
+    ],
+    "AC-7E-FRICTION-001": [
+      "T-7E-04"
+    ],
+    "AC-7E-EVIDENCE-001": [
+      "T-7E-05"
+    ],
+    "AC-7D-EVIDENCE-002": [
+      "T-7E-06"
+    ],
+    "AC-7E-EVIDENCE-002": [
+      "T-7E-06"
+    ]
+  }
+}

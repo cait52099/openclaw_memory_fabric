@@ -1,0 +1,12 @@
+## Memory Explanation
+
+Source: Codex
+Timestamp: 2026-03-22 06:41
+
+Match Reasons:
+  • Keyword match: testing, framework
+  • Scope match: project=regression_test
+
+Also written by: claude-code
+
+Matched keywords: testing, framework; Matched scope project=regression_test; Source: Codex; Also written by: Claude

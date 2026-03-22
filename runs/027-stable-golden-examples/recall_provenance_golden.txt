@@ -1,0 +1,37 @@
+======================================================================
+RECALL PROVENANCE GOLDEN EXAMPLE
+======================================================================
+
+Query: 'python version'
+Memories found: 5
+
+MEMORIES WITH PROVENANCE:
+----------------------------------------
+  From Claude (2026-03-22 01:39):
+    Content: Python version: 3.12 has fastest execution
+    Summary: Python 3.12 fastest
+
+  From Codex (2026-03-22 01:39):
+    Content: Python version: 3.9 is stable and widely compatible
+    Summary: Python 3.9 stable
+
+  From Claude (2026-03-22 01:39):
+    Content: Python version: use 3.11+ for best performance
+    Summary: Python 3.11+ recommended
+
+  From Codex (2026-03-22 01:39):
+    Content: Testing framework: unittest is built-in and works well for Python
+    Summary: Unittest recommended
+
+  From Claude (2026-03-22 01:39):
+    Content: Testing framework: pytest is the best for unit testing in Python
+    Summary: Pytest recommended
+
+CLI OUTPUT FORMAT:
+----------------------------------------
+Found 5 memories:
+  From Claude: "Python version: 3.12 has fastest execution" (2026-03-22 01:39)
+  From Codex: "Python version: 3.9 is stable and widely compatibl" (2026-03-22 01:39)
+  From Claude: "Python version: use 3.11+ for best performance" (2026-03-22 01:39)
+  From Codex: "Testing framework: unittest is built-in and works " (2026-03-22 01:39)
+  From Claude: "Testing framework: pytest is the best for unit tes" (2026-03-22 01:39)

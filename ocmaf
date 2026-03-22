@@ -1,0 +1,18 @@
+#!/bin/bash
+# OCMF Bootstrap Wrapper
+# This script provides a convenient entry point to OCMF CLI
+# without requiring users to set PYTHONPATH manually.
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Set PYTHONPATH to include the src directory
+export PYTHONPATH="${SCRIPT_DIR}/src:${PYTHONPATH}"
+
+# Auto-source OCMF config if it exists (provides OCMF_SOURCE_TOOL and other env vars)
+if [ -f "${HOME}/.ocmf/config.sh" ]; then
+    source "${HOME}/.ocmf/config.sh"
+fi
+
+# Run the OCMF CLI with any passed arguments
+exec python3 -m ocmaf.cli.unified "$@"

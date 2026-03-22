@@ -1,0 +1,29 @@
+======================================================================
+INJECTION TEXT GOLDEN EXAMPLE
+======================================================================
+
+to_injection_text() OUTPUT:
+----------------------------------------
+## Relevant Context
+
+### Testing framework
+(From Codex at 01:39)
+Summary: Unittest recommended
+
+### Testing framework
+(From Claude at 01:39)
+Summary: Pytest recommended
+
+⚠️ CONFLICT DETECTED
+Multiple versions found (2 conflicting memories):
+  - [Codex] "Testing framework: unittest is built-in and works well for P"
+  - [Claude] "Testing framework: pytest is the best for unit testing in Py"
+
+======================================================================
+to_gist_text() OUTPUT:
+----------------------------------------
+## Relevant Context (Gist)
+- [Codex (01:39)] Unittest recommended
+- [Claude (01:39)] Pytest recommended
+
+⚠️ CONFLICT: Multiple versions exist - see detail for options

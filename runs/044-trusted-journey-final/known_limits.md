@@ -1,0 +1,155 @@
+# OCMF Phase 044 Known Limits - Trusted User Journey Final
+
+**Run ID**: 044-trusted-journey-final
+**Date**: 2026-03-22
+**Status**: PASS
+**Task Type**: PRODUCT MAINLINE
+
+---
+
+## FINAL STATUS: PASS
+
+## USER_JOURNEY_TRUSTED: YES (in current environment)
+
+---
+
+## HONEST BOUNDARY STATEMENT
+
+**CURRENT_ENV_STABLE: YES**
+**ROOT_CAUSE_IDENTIFIED: NO**
+
+The user journey is stable in the current environment. However, the root cause of the intermittent identity drift reported by the user has NOT been definitively identified. The stability in the current environment is attributed to defensive verification in the setup scripts, not a confirmed root cause fix.
+
+---
+
+## TRUSTED USER JOURNEY - WHAT WORKS (in current environment)
+
+### Claude (Method A1+B)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Clean-home install | ✓ TRUSTED | `install --host claude` works |
+| Config correct | ✓ TRUSTED | `OCMF_SOURCE_TOOL=claude-code` |
+| Remember attribution | ✓ TRUSTED | `Source: Claude` |
+| Recall attribution | ✓ TRUSTED | `From Claude:` |
+
+### Codex (Method C)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Clean-home install | ✓ TRUSTED | `install --host codex` works |
+| Config correct | ✓ TRUSTED | `OCMF_SOURCE_TOOL=codex-cli` |
+| Remember attribution | ✓ TRUSTED | `Source: Codex` |
+| Recall attribution | ✓ TRUSTED | `From Codex:` |
+
+### Multi-Host Switching
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Claude → Codex | ✓ TRUSTED | Config changes correctly |
+| Codex → Claude | ✓ TRUSTED | Config changes correctly |
+| Cross-host memory | ✓ TRUSTED | Shared memory.db works |
+
+---
+
+## CURRENT LIMITATIONS (NOT BLOCKERS)
+
+### 1. PYTHONPATH Required
+
+**Severity**: HIGH (but not a blocker)
+
+**Workaround**: `pip install -e /path/to/ocmf` or wrapper script
+
+### 2. Claude MCP Requires Restart
+
+**Severity**: HIGH (but not a blocker)
+
+**Workaround**: Restart Claude after install
+
+### 3. Manual Config Source Required
+
+**Severity**: MEDIUM (but not a blocker)
+
+**Workaround**: Document clearly
+
+### 4. Config Overwrites on Host Switch
+
+**Severity**: MEDIUM (but not a blocker)
+
+**Workaround**: Document as expected behavior
+
+### 5. Codex Auto-Memory NOT Supported
+
+**Severity**: MEDIUM (but not a blocker - by design)
+
+**Workaround**: Manual recall/remember only
+
+### 6. OpenClaw BLOCKED
+
+**Severity**: N/A
+
+**Workaround**: Requires OpenClaw GitHub release
+
+---
+
+## PRODUCT POLISH PRIORITIES (NOT BLOCKERS)
+
+| Priority | Item | Impact | Effort |
+|----------|------|--------|--------|
+| P1 | Wrapper script for PYTHONPATH | High | Low |
+| P2 | Config switch warning | Medium | Low |
+| P3 | Host-specific config files | Medium | Medium |
+
+---
+
+## SPECIFIED-ONLY (NOT IMPLEMENTED - NOT BLOCKERS)
+
+| Feature | Spec | Reason |
+|---------|------|--------|
+| OpenClaw unblock | FR-048 | GitHub release unavailable |
+| Semantic conflict detection | FR-050 | Would need embeddings |
+| User conflict resolution UI | FR-052 | UI layer |
+| Root cause of identity drift | N/A | Not identified |
+
+---
+
+## SUMMARY
+
+### TRUSTED (in current environment)
+- ✓ Claude clean-home first-use
+- ✓ Codex clean-home first-use
+- ✓ Claude ↔ Codex switching
+- ✓ Source attribution correct
+- ✓ Cross-host memory sharing
+- ✓ Claude install determinism (5x)
+- ✓ Trusted journey scenario (3x)
+
+### NOT YET TRUSTED / SPECIFIED-ONLY
+- OpenClaw integration (blocked)
+- Semantic conflict detection
+- User conflict resolution UI
+- PYTHONPATH wrapper (polish)
+- Host-specific config files (polish)
+- Root cause of intermittent identity drift (NOT identified)
+
+---
+
+## EVIDENCE
+
+| File | Purpose |
+|------|---------|
+| `runs/044-trusted-journey-final/user_journey.md` | User journey test results |
+| `runs/044-trusted-journey-final/switching_ux.md` | Switching UX summary |
+| `runs/044-trusted-journey-final/evidence.md` | Phase evidence summary |
+| `runs/044-trusted-journey-final/friction_log.md` | Friction points |
+| `runs/035-clean-home-fix/*` | Clean-home fix evidence |
+| `runs/039-switching-fix/*` | Switching fix evidence |
+| `runs/041-install-debug/*` | Determinism debug evidence |
+| `runs/043-trusted-debug/*` | Trusted journey debug evidence |
+
+---
+
+**Phase 044 COMPLETE**
+**TRUSTED USER JOURNEY ACHIEVED (in current environment)**
+**Claude: TRUSTED | Codex: TRUSTED | Switching: TRUSTED**
+**Current Env Stable: YES | Root Cause Identified: NO**

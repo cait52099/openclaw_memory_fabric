@@ -1,0 +1,35 @@
+======================================================================
+RECALL CONFLICT GOLDEN EXAMPLE
+======================================================================
+
+Query: 'testing framework'
+Conflict detected: True
+Number of candidates: 2
+
+MEMORIES RETURNED:
+----------------------------------------
+  Source: Codex
+  Timestamp: 2026-03-22 01:39
+  Content: Testing framework: unittest is built-in and works well for Python
+  Summary: Unittest recommended
+
+  Source: Claude
+  Timestamp: 2026-03-22 01:39
+  Content: Testing framework: pytest is the best for unit testing in Python
+  Summary: Pytest recommended
+
+CONFLICT CANDIDATES:
+----------------------------------------
+  [Codex] Testing framework: unittest is built-in and works well for P
+  [Claude] Testing framework: pytest is the best for unit testing in Py
+
+CLI OUTPUT FORMAT:
+----------------------------------------
+Found 2 memories:
+  From Codex: "Testing framework: unittest is built-in and works " (2026-03-22 01:39)
+  From Claude: "Testing framework: pytest is the best for unit tes" (2026-03-22 01:39)
+
+⚠️ CONFLICT DETECTED
+  2 conflicting versions found:
+  - [Codex] "Testing framework: unittest is built-in and works "
+  - [Claude] "Testing framework: pytest is the best for unit tes"

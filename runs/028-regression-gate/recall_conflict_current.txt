@@ -1,0 +1,8 @@
+Found 2 memories:
+  From Codex: "Testing framework: unittest is built-in and works " (2026-03-22 06:41)
+  From Claude: "Testing framework: pytest is the best for unit tes" (2026-03-22 06:41)
+
+⚠️ CONFLICT DETECTED
+  2 conflicting versions found:
+  - [Codex] "Testing framework: unittest is built-in and works "
+  - [Claude] "Testing framework: pytest is the best for unit tes"

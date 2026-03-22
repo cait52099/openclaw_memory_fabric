@@ -1,0 +1,46 @@
+======================================================================
+EXPLAIN CROSS-HOST GOLDEN EXAMPLE
+======================================================================
+
+Memory ID: a92a1e5f-4221-45eb-bef2-35ca418a3e1d
+Recall Query: 'testing framework'
+
+STRUCTURED OUTPUT:
+----------------------------------------
+  success: True
+  source_host_friendly: Codex
+  event_timestamp: 2026-03-22T01:39:12.288710+00:00
+  match_reasons: [
+    {
+        "type": "keyword",
+        "matched": [
+            "testing",
+            "framework"
+        ]
+    },
+    {
+        "type": "scope",
+        "matched": {
+            "project": "golden_test_project"
+        }
+    }
+]
+  also_written_by: ['claude-code']
+  explain: Matched keywords: testing, framework; Matched scope project=golden_test_project; Source: Codex; Also written by: Claude
+
+CLI FRIENDLY OUTPUT FORMAT:
+----------------------------------------
+## Memory Explanation
+
+Source: Codex
+Timestamp: 2026-03-22 01:39
+
+Match Reasons:
+  • Keyword match: testing, framework
+  • Scope match: project=golden_test_project
+
+Also written by: claude-code
+
+Matched keywords: testing, framework; Matched scope project=golden_test_project; Source: Codex; Also written by: Claude
+
+Content: "Testing framework: unittest is built-in and works well for Python"
